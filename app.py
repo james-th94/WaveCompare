@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 import numpy as np
 
 # %% User inputs
-wavedata_file = "data/Grassy_-40.1250_144.0625_19870101_20231231_WHACS.csv"
+wavedata_file = "data/wave_data.csv"
 # date parser for the wavedata file "datetime" format
 custom_date_parser = lambda x: pd.to_datetime(
     x, format="%Y-%m-%d %H:%M:%S", errors="coerce"
@@ -127,7 +127,6 @@ fig = px.bar_polar(
     theta=direction_rosename,
     color=wave_name,
     color_discrete_sequence=wave_colours,
-    title=f"Wave Rose - {selected_year}",
 )
 
 # %% Wave rose 2
@@ -147,7 +146,6 @@ fig2 = px.bar_polar(
     theta=direction_rosename,
     color=wave2_name,
     color_discrete_sequence=wave2_colours,
-    title=f"Wave Rose - {selected_year}",
 )
 
 # %% Deploy chart with streamlit
