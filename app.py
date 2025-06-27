@@ -6,6 +6,7 @@ Created 26 June 2025, JT.
 
 # %% Python setup
 """Make sure these packages are in the requirements.txt file for Streamlit to work."""
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -75,12 +76,13 @@ fig_ts.add_trace(
 fig_ts.update_layout(
     height=800,
     margin=dict(t=30, b=50),
-    xaxis=dict(domain=[0.05, 0.95]),
+    xaxis4=dict(domain=[0.05, 0.95]),
     yaxis=dict(title=wave_name, anchor="x", domain=[0.77, 0.98]),
     yaxis2=dict(title=wave2_name, anchor="x", domain=[0.52, 0.73]),
     yaxis3=dict(title=wave3_name, anchor="x", domain=[0.27, 0.48]),
     yaxis4=dict(title=direction_name, anchor="x", domain=[0.05, 0.23]),
     showlegend=False,
+    title="Wave Timeseries (all data)",
 )
 st.plotly_chart(fig_ts, use_container_width=True)
 
