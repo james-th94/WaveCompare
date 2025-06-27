@@ -56,7 +56,7 @@ def load_data(filename, datetime_column=datetime_col):
 df = load_data(wavedata_file)
 
 # %% Add header to page
-st.header("Wave Data", divider="True")
+st.header("Wave Data", divider="grey")
 
 # %% Timeseries multi-plot
 # Create 3 stacked subplots
