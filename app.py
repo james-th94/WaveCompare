@@ -33,7 +33,7 @@ freq_name = "Relative frequency (%)"
 
 
 # %% Load data
-# @st.cache_data
+@st.cache_data
 def load_data(filename, datetime_column=datetime_col):
     df = pd.read_csv(
         wavedata_file,
