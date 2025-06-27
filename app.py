@@ -5,7 +5,7 @@ Created 26 June 2025, JT.
 """
 
 # %% Python setup
-"""Make sure these packages are in the requirements.txt file for Streamlit to work."""
+# """Make sure these packages are in the requirements.txt file for Streamlit to work."""
 
 import streamlit as st
 import pandas as pd
