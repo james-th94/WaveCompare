@@ -9,7 +9,6 @@
 *.jpg
 *.pkl
 *.kml
-*.txt
 *.geojson
 *checkpoint.ipynb
 *.csv
