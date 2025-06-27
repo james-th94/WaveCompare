@@ -14,18 +14,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-# # date parser for the wavedata file "datetime" format
-# def custom_date_parser(x):
-#     try:
-#         return pd.to_datetime(x, format="%Y-%m-%d %H:%M:%S")
-#     except ValueError:
-#         try:
-#             return pd.to_datetime(
-#                 x, format="%Y-%m-%d %H:%M:%S.%f"
-#             )  # fallback for nanosecond or auto-parse
-#         except Exception:
-#             return pd.NaT
-
 
 def parse_two_formats(datetime_series):
     # Try fast parsing with format 1
@@ -65,8 +53,12 @@ wave3_name = "Peak wave period (Tp)"
 # For wave roses:
 freq_name = "Relative frequency (%)"
 
+# Event dates
+event_dates_start = "10/01/2021"
+event_dates_end = "28/03/2023"
 
-# %% Load data
+
+# %% Load data & cache to streamlit app
 @st.cache_data
 def load_data(filename, datetime_column=datetime_col):
     # Load data from csv
@@ -82,13 +74,13 @@ def load_data(filename, datetime_column=datetime_col):
     return df
 
 
+# Load data to dataframe (df) for data analysis
 df = load_data(filename=wavedata_file)
 
-# %% Add header to page
+# %% Add header to Streamlit webpage
 st.header("Wave Data", divider="grey")
 
-# %% Timeseries multi-plot
-# Create 3 stacked subplots
+# %% Timeseries multi-plot - 3 stacked subplots
 fig_ts = go.Figure()
 
 # Subplot 1
@@ -181,11 +173,54 @@ fig2 = px.bar_polar(
     color_discrete_sequence=wave2_colours,
 )
 
+# %% Wave rose 3
+df_during = df[(df.index >= event_dates_start) & (df.index <= event_dates_end)].copy()
+df_pre = df[df.index < event_dates_start].copy()
+
+figs = {}
+for idx, df in enumerate([df_pre, df_during]):
+    # Filter data
+    df_year = df[df["year"] == selected_year].copy()
+
+    # Compute wave rose bins
+    dir_bins = np.arange(0, 361, direction_resolution)
+    df_year.loc[:, direction_rosename] = pd.cut(
+        df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
+    )
+
+    df_year.loc[:, wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
+
+    rose_data = (
+        df_year.groupby([direction_rosename, wave_name], observed=False)
+        .size()
+        .reset_index(name="counts")
+    )
+    rose_data[freq_name] = round(
+        100 * (rose_data["counts"] / rose_data["counts"].sum()), 2
+    )
+    rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
+    rose_data[wave_name] = rose_data[wave_name].astype(str)
+
+    # Plot polar wave rose
+    figs[idx] = px.bar_polar(
+        rose_data,
+        r=freq_name,
+        theta=direction_rosename,
+        color=wave_name,
+        color_discrete_sequence=wave_colours,
+    )
+
 # %% Deploy chart with streamlit
-tab1, tab2 = st.tabs([wave_name, wave2_name])
+tab1, tab2, tab3, tab4 = st.tabs(
+    [wave_name, wave2_name, f"Pre-event: {wave_name}", f"During-event: {wave_name}"]
+)
 with tab1:
     st.plotly_chart(fig, use_container_width=True)
 with tab2:
     st.plotly_chart(fig2, use_container_width=True)
+with tab3:
+    st.plotly_chart(figs[0], use_container_width=True)
+with tab4:
+    st.plotly_chart(figs[1], use_container_width=True)
 
-# %%
+# %% THE END
