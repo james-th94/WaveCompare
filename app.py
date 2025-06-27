@@ -183,6 +183,7 @@ with tab2:
 
 # %% Wave roses - pre and during an event
 st.subheader("Wave roses before and during an event")
+st.caption(f"Event dates: {event_dates_start} to {event_dates_end}")
 df_during = df[(df.index >= event_dates_start) & (df.index <= event_dates_end)].copy()
 df_pre = df[df.index < event_dates_start].copy()
 
@@ -214,7 +215,6 @@ for idx, data in enumerate([df_pre, df_during]):
         theta=direction_rosename,
         color=wave_name,
         color_discrete_sequence=wave_colours,
-        title=f"Event dates: {event_dates_start} tp {event_dates_end}",
     )
 
 # %% Deploy charts with Streamlit
