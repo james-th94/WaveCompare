@@ -17,15 +17,30 @@ import numpy as np
 wavedata_file = "data/wave_data.csv"
 
 
-# date parser for the wavedata file "datetime" format
-def custom_date_parser(x):
-    try:
-        return pd.to_datetime(x, format="%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        try:
-            return pd.to_datetime(x)  # fallback for nanosecond or auto-parse
-        except Exception:
-            return pd.NaT
+# # date parser for the wavedata file "datetime" format
+# def custom_date_parser(x):
+#     try:
+#         return pd.to_datetime(x, format="%Y-%m-%d %H:%M:%S")
+#     except ValueError:
+#         try:
+#             return pd.to_datetime(
+#                 x, format="%Y-%m-%d %H:%M:%S.%f"
+#             )  # fallback for nanosecond or auto-parse
+#         except Exception:
+#             return pd.NaT
+
+
+def parse_two_formats(s):
+    # Try fast parsing with format 1
+    parsed = pd.to_datetime(s, format="%Y-%m-%d %H:%M:%S", errors="coerce")
+
+    # Fill NaT values using second format
+    mask = parsed.isna()
+    parsed[mask] = pd.to_datetime(
+        s[mask], format="%Y-%m-%d %H:%M:%S.%f", errors="coerce"
+    ).dt.round("s")
+
+    return parsed
 
 
 # Set variables to plot
@@ -50,13 +65,14 @@ freq_name = "Relative frequency (%)"
 
 # %% Load data
 @st.cache_data
-def load_data(filename, datetime_column=datetime_col):
+def load_data(filename):
     df = pd.read_csv(
-        wavedata_file,
-        index_col=datetime_col,
-        parse_dates=[datetime_col],
-        date_parser=custom_date_parser,
+        filename,
     )
+    # Fix datetimes and set as index
+    df[datetime_col] = parse_two_formats(df[datetime_col])
+    df.index = df[datetime_col]
+    df = df.drop(columns=[datetime_col])
     df["year"] = df.index.year
     return df
 
