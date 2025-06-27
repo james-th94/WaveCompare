@@ -1,6 +1,7 @@
 # %% Code description
-"""Streamlit app to show wave data. Deployed via GitHub repository: https://github.com/james-th94/WaveCompare/
-
+"""Streamlit app to show wave data.
+GitHub repository: https://github.com/james-th94/WaveCompare/
+App: https://wavecompare.streamlit.app/
 Created 26 June 2025, JT.
 """
 
@@ -12,10 +13,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
-
-# %% User inputs
-wavedata_file = "data/wave_data.csv"
-
 
 # # date parser for the wavedata file "datetime" format
 # def custom_date_parser(x):
@@ -30,18 +27,24 @@ wavedata_file = "data/wave_data.csv"
 #             return pd.NaT
 
 
-def parse_two_formats(s):
+def parse_two_formats(datetime_series):
     # Try fast parsing with format 1
-    parsed = pd.to_datetime(s, format="%Y-%m-%d %H:%M:%S", errors="coerce")
+    parsed = pd.to_datetime(
+        datetime_series, format="%Y-%m-%d %H:%M:%S", errors="coerce"
+    )
 
     # Fill NaT values using second format
     mask = parsed.isna()
     parsed[mask] = pd.to_datetime(
-        s[mask], format="%Y-%m-%d %H:%M:%S.%f", errors="coerce"
+        datetime_series[mask], format="%Y-%m-%d %H:%M:%S.%f", errors="coerce"
     ).dt.round("s")
 
     return parsed
 
+
+# %% User inputs
+# Input file
+wavedata_file = "data/wave_data.csv"
 
 # Set variables to plot
 datetime_col = "datetime"
@@ -65,19 +68,21 @@ freq_name = "Relative frequency (%)"
 
 # %% Load data
 @st.cache_data
-def load_data(filename):
+def load_data(filename, datetime_column=datetime_col):
+    # Load data from csv
     df = pd.read_csv(
         filename,
     )
     # Fix datetimes and set as index
-    df[datetime_col] = parse_two_formats(df[datetime_col])
-    df.index = df[datetime_col]
-    df = df.drop(columns=[datetime_col])
+    df[datetime_column] = parse_two_formats(datetime_series=df[datetime_column])
+    df.index = df[datetime_column]
+    df = df.drop(columns=[datetime_column])
+    # Add Year column
     df["year"] = df.index.year
     return df
 
 
-df = load_data(wavedata_file)
+df = load_data(filename=wavedata_file)
 
 # %% Add header to page
 st.header("Wave Data", divider="grey")
