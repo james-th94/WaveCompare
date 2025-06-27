@@ -23,7 +23,8 @@ custom_date_parser = lambda x: pd.to_datetime(
 datetime_col = "datetime"
 direction_col = "dp"
 direction_resolution = 22.5  # degrees
-direction_name = "Directional bin (\u00b0)"
+direction_name = "Peak wave direction (\u00b0)"
+direction_rosename = "Directional bin (\u00b0)"
 wave_col = "cge"
 wave_bins = np.arange(0, 120, 10)  # Wave "height/power" bins for waverose
 wave_name = "Wave energy flux (kW/m)"
@@ -98,7 +99,7 @@ df_year = df[df["year"] == selected_year]
 
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
-df_year[direction_name] = pd.cut(
+df_year[direction_rosename] = pd.cut(
     df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
 )
 
@@ -107,17 +108,17 @@ df_year[wave2_name] = pd.cut(df_year[wave2_col], bins=wave2_bins, right=False)
 
 # %% Wave rose 1
 rose_data = (
-    df_year.groupby([direction_name, wave_name]).size().reset_index(name="counts")
+    df_year.groupby([direction_rosename, wave_name]).size().reset_index(name="counts")
 )
 rose_data[freq_name] = round(100 * (rose_data["counts"] / rose_data["counts"].sum()), 2)
-rose_data[direction_name] = rose_data[direction_name].astype(float)
+rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
 rose_data[wave_name] = rose_data[wave_name].astype(str)
 
 # Plot polar wave rose
 fig = px.bar_polar(
     rose_data,
     r=freq_name,
-    theta=direction_name,
+    theta=direction_rosename,
     color=wave_name,
     color_discrete_sequence=wave_colours,
     title=f"Wave Rose - {selected_year}",
@@ -125,19 +126,19 @@ fig = px.bar_polar(
 
 # %% Wave rose 2
 rose2_data = (
-    df_year.groupby([direction_name, wave2_name]).size().reset_index(name="counts")
+    df_year.groupby([direction_rosename, wave2_name]).size().reset_index(name="counts")
 )
 rose2_data[freq_name] = round(
     100 * (rose2_data["counts"] / rose2_data["counts"].sum()), 2
 )
-rose2_data[direction_name] = rose2_data[direction_name].astype(float)
+rose2_data[direction_rosename] = rose2_data[direction_rosename].astype(float)
 rose2_data[wave2_name] = rose2_data[wave2_name].astype(str)
 
 # Plot polar wave rose
 fig2 = px.bar_polar(
     rose2_data,
     r=freq_name,
-    theta=direction_name,
+    theta=direction_rosename,
     color=wave2_name,
     color_discrete_sequence=wave2_colours,
     title=f"Wave Rose - {selected_year}",
