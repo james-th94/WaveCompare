@@ -130,7 +130,7 @@ selected_year = st.slider(
 )
 
 # Filter data
-df_year = df[df["year"] == selected_year]
+df_year = df[df["year"] == selected_year].copy()
 
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
