@@ -22,8 +22,9 @@ direction_col = "dp"
 direction_resolution = 22.5  # degrees
 direction_name = "Directional bin (\u00b0)"
 wave_col = "cge"
-wave_bins = np.arange(0, 100, 20)  # Wave "height/power" bins for waverose
+wave_bins = np.arange(0, 120, 10)  # Wave "height/power" bins for waverose
 wave_name = "Wave energy flux (kW/m)"
+wave_colours = px.colors.sequential.Plasma_r
 freq_name = "Relative frequency (%)"
 
 
@@ -67,7 +68,7 @@ df_year[wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
 rose_data = (
     df_year.groupby([direction_name, wave_name]).size().reset_index(name="counts")
 )
-rose_data[freq_name] = 100 * (rose_data["counts"] / rose_data["counts"].sum())
+rose_data[freq_name] = round(100 * (rose_data["counts"] / rose_data["counts"].sum()), 2)
 rose_data[direction_name] = rose_data[direction_name].astype(float)
 rose_data[wave_name] = rose_data[wave_name].astype(str)
 
@@ -77,7 +78,7 @@ fig = px.bar_polar(
     r=freq_name,
     theta=direction_name,
     color=wave_name,
-    color_discrete_sequence=px.colors.sequential.Plasma_r,
+    color_discrete_sequence=wave_colours,
     title=f"Wave Rose - {selected_year}",
 )
 
