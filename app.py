@@ -214,6 +214,7 @@ for idx, data in enumerate([df_pre, df_during]):
         theta=direction_rosename,
         color=wave_name,
         color_discrete_sequence=wave_colours,
+        title=f"Event dates: {event_dates_start} tp {event_dates_end}",
     )
 
 # %% Deploy charts with Streamlit
