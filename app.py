@@ -55,6 +55,9 @@ def load_data(filename, datetime_column=datetime_col):
 
 df = load_data(wavedata_file)
 
+# %% Add header to page
+st.header("Wave Data", divider="True")
+
 # %% Timeseries multi-plot
 # Create 3 stacked subplots
 fig_ts = go.Figure()
@@ -89,6 +92,7 @@ st.plotly_chart(fig_ts, use_container_width=True)
 # %% Process data and create waverose
 # Sidebar - Year selection
 years = sorted(df["year"].unique())
+st.subheader("Yearly wave roses")
 selected_year = st.slider(
     "Select year",
     min_value=int(min(years)),
