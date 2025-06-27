@@ -134,16 +134,18 @@ df_year = df[df["year"] == selected_year].copy()
 
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
-df_year[direction_rosename] = pd.cut(
+df_year.loc[:, direction_rosename] = pd.cut(
     df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
 )
 
-df_year[wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
-df_year[wave2_name] = pd.cut(df_year[wave2_col], bins=wave2_bins, right=False)
+df_year.loc[:, wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
+df_year.loc[:, wave2_name] = pd.cut(df_year[wave2_col], bins=wave2_bins, right=False)
 
 # %% Wave rose 1
 rose_data = (
-    df_year.groupby([direction_rosename, wave_name]).size().reset_index(name="counts")
+    df_year.groupby([direction_rosename, wave_name], observed=False)
+    .size()
+    .reset_index(name="counts")
 )
 rose_data[freq_name] = round(100 * (rose_data["counts"] / rose_data["counts"].sum()), 2)
 rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
@@ -160,7 +162,9 @@ fig = px.bar_polar(
 
 # %% Wave rose 2
 rose2_data = (
-    df_year.groupby([direction_rosename, wave2_name]).size().reset_index(name="counts")
+    df_year.groupby([direction_rosename, wave2_name], observed=False)
+    .size()
+    .reset_index(name="counts")
 )
 rose2_data[freq_name] = round(
     100 * (rose2_data["counts"] / rose2_data["counts"].sum()), 2
