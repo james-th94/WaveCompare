@@ -59,7 +59,7 @@ event_dates_end = "28/03/2023"
 
 
 # %% Load data & cache to streamlit app
-@st.cache_data
+# @st.cache_data
 def load_data(filename, datetime_column=datetime_col):
     # Load data from csv
     df = pd.read_csv(
@@ -173,25 +173,31 @@ fig2 = px.bar_polar(
     color_discrete_sequence=wave2_colours,
 )
 
-# %% Wave rose 3
+# %% Deploy charts with streamlit
+tab1, tab2 = st.tabs([wave_name, wave2_name])
+with tab1:
+    st.plotly_chart(fig, use_container_width=True)
+with tab2:
+    st.plotly_chart(fig2, use_container_width=True)
+
+
+# %% Wave roses - pre and during an event
+st.subheader("Wave roses before and during an event")
 df_during = df[(df.index >= event_dates_start) & (df.index <= event_dates_end)].copy()
 df_pre = df[df.index < event_dates_start].copy()
 
 figs = {}
-for idx, df in enumerate([df_pre, df_during]):
-    # Filter data
-    df_year = df[df["year"] == selected_year].copy()
-
+for idx, data in enumerate([df_pre, df_during]):
     # Compute wave rose bins
     dir_bins = np.arange(0, 361, direction_resolution)
-    df_year.loc[:, direction_rosename] = pd.cut(
-        df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
+    data.loc[:, direction_rosename] = pd.cut(
+        data[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
     )
 
-    df_year.loc[:, wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
+    data.loc[:, wave_name] = pd.cut(data[wave_col], bins=wave_bins, right=False)
 
     rose_data = (
-        df_year.groupby([direction_rosename, wave_name], observed=False)
+        data.groupby([direction_rosename, wave_name], observed=False)
         .size()
         .reset_index(name="counts")
     )
@@ -210,17 +216,12 @@ for idx, df in enumerate([df_pre, df_during]):
         color_discrete_sequence=wave_colours,
     )
 
-# %% Deploy chart with streamlit
-tab1, tab2, tab3, tab4 = st.tabs(
-    [wave_name, wave2_name, f"Pre-event: {wave_name}", f"During-event: {wave_name}"]
-)
+# %% Deploy charts with Streamlit
+tab1, tab2 = st.tabs([f"Pre-event: {wave_name}", f"During-event: {wave_name}"])
 with tab1:
-    st.plotly_chart(fig, use_container_width=True)
-with tab2:
-    st.plotly_chart(fig2, use_container_width=True)
-with tab3:
     st.plotly_chart(figs[0], use_container_width=True)
-with tab4:
+with tab2:
     st.plotly_chart(figs[1], use_container_width=True)
+
 
 # %% THE END
