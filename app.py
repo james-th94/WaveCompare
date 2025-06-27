@@ -15,10 +15,18 @@ import numpy as np
 
 # %% User inputs
 wavedata_file = "data/wave_data.csv"
+
+
 # date parser for the wavedata file "datetime" format
-custom_date_parser = lambda x: pd.to_datetime(
-    x, format="%Y-%m-%d %H:%M:%S", errors="coerce"
-)
+def custom_date_parser(x):
+    try:
+        return pd.to_datetime(x, format="%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        try:
+            return pd.to_datetime(x)  # fallback for nanosecond or auto-parse
+        except Exception:
+            return pd.NaT
+
 
 # Set variables to plot
 datetime_col = "datetime"
