@@ -20,12 +20,15 @@ custom_date_parser = lambda x: pd.to_datetime(
 datetime_col = "datetime"
 direction_col = "dp"
 direction_resolution = 22.5  # degrees
+direction_name = "Directional bin (\u00b0)"
 wave_col = "cge"
-wave_bins = np.arange(0, 10, 1)  # Wave "height/power" bins for waverose
+wave_bins = np.arange(0, 100, 20)  # Wave "height/power" bins for waverose
+wave_name = "Wave energy flux (kW/m)"
+freq_name = "Relative frequency (%)"
 
 
 # %% Load data
-@st.cache_data
+# @st.cache_data
 def load_data(filename, datetime_column=datetime_col):
     df = pd.read_csv(
         wavedata_file,
@@ -55,22 +58,25 @@ df_year = df[df["year"] == selected_year]
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
 
-df_year["dir_bin"] = pd.cut(
+df_year[direction_name] = pd.cut(
     df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
 )
-df_year["wave_bin"] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
+df_year[wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
 
 # Count occurrences
-rose_data = df_year.groupby(["dir_bin", "wave_bin"]).size().reset_index(name="counts")
-rose_data["dir_bin"] = rose_data["dir_bin"].astype(float)
-rose_data["wave_bin"] = rose_data["wave_bin"].astype(str)
+rose_data = (
+    df_year.groupby([direction_name, wave_name]).size().reset_index(name="counts")
+)
+rose_data[freq_name] = 100 * (rose_data["counts"] / rose_data["counts"].sum())
+rose_data[direction_name] = rose_data[direction_name].astype(float)
+rose_data[wave_name] = rose_data[wave_name].astype(str)
 
 # Plot polar wave rose
 fig = px.bar_polar(
     rose_data,
-    r="counts",
-    theta="dir_bin",
-    color="wave_bin",
+    r=freq_name,
+    theta=direction_name,
+    color=wave_name,
     color_discrete_sequence=px.colors.sequential.Plasma_r,
     title=f"Wave Rose - {selected_year}",
 )
