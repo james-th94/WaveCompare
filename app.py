@@ -25,6 +25,10 @@ wave_col = "cge"
 wave_bins = np.arange(0, 120, 10)  # Wave "height/power" bins for waverose
 wave_name = "Wave energy flux (kW/m)"
 wave_colours = px.colors.sequential.Plasma_r
+wave2_col = "hs"
+wave2_bins = np.arange(0, 8, 0.5)  # Wave "height/power" bins for waverose
+wave2_name = "Significant wave height (m)"
+wave2_colours = px.colors.sequential.Plasma_r
 freq_name = "Relative frequency (%)"
 
 
@@ -58,11 +62,12 @@ df_year = df[df["year"] == selected_year]
 
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
-
 df_year[direction_name] = pd.cut(
     df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
 )
+
 df_year[wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
+df_year[wave2_name] = pd.cut(df_year[wave2_col], bins=wave2_bins, right=False)
 
 # Count occurrences
 rose_data = (
@@ -82,7 +87,31 @@ fig = px.bar_polar(
     title=f"Wave Rose - {selected_year}",
 )
 
+# Count occurrences
+rose2_data = (
+    df_year.groupby([direction_name, wave2_name]).size().reset_index(name="counts")
+)
+rose2_data[freq_name] = round(
+    100 * (rose2_data["counts"] / rose2_data["counts"].sum()), 2
+)
+rose2_data[direction_name] = rose2_data[direction_name].astype(float)
+rose2_data[wave2_name] = rose2_data[wave2_name].astype(str)
+
+# Plot polar wave rose
+fig2 = px.bar_polar(
+    rose2_data,
+    r=freq_name,
+    theta=direction_name,
+    color=wave2_name,
+    color_discrete_sequence=wave2_colours,
+    title=f"Wave Rose - {selected_year}",
+)
+
 # %% Deploy chart with streamlit
-st.plotly_chart(fig, use_container_width=True)
+tab1, tab2 = st.tabs([wave_name, wave2_name])
+with tab1:
+    st.plotly_chart(fig, use_container_width=True)
+with tab2:
+    st.plotly_chart(fig2, use_container_width=True)
 
 # %%
