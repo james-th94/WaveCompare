@@ -207,66 +207,50 @@ df_selected = df[df[slider_timestep] == selected].copy()
 
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
-df_selected.loc[:, direction_rosename] = pd.cut(
-    df_selected[f"{direction_name}_obs"],
-    bins=dir_bins,
-    right=False,
-    labels=dir_bins[:-1],
-)
 
-df_selected.loc[:, wave_name] = pd.cut(
-    df_selected[f"{wave_name}_obs"], bins=wave_bins, right=False
-)
-# df_selected.loc[:, wave_name] = pd.cut(df_selected[wave_name], bins=wave_bins, right=False)
+figs = {}
+tabs = {}
+for idx, data_source in enumerate(["obs", "model"]):
+    # Name the tab:
+    tabs[idx] = data_source
+    # Select data
+    # Set direction data
+    df_selected.loc[:, direction_rosename] = pd.cut(
+        df_selected[f"{direction_name}_{data_source}"],
+        bins=dir_bins,
+        right=False,
+        labels=dir_bins[:-1],
+    )
+    # Set wave "height" data
+    df_selected.loc[:, wave_name] = pd.cut(
+        df_selected[f"{wave_name}_{data_source}"], bins=wave_bins, right=False
+    )
 
-# %% Wave rose 1
-rose_data = (
-    df_selected.groupby([direction_rosename, wave_name], observed=False)
-    .size()
-    .reset_index(name="counts")
-)
-rose_data[freq_name] = round(100 * (rose_data["counts"] / rose_data["counts"].sum()), 2)
-rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
-rose_data[wave_name] = rose_data[wave_name].astype(str)
+    rose_data = (
+        df_selected.groupby([direction_rosename, wave_name], observed=False)
+        .size()
+        .reset_index(name="counts")
+    )
+    rose_data[freq_name] = round(
+        100 * (rose_data["counts"] / rose_data["counts"].sum()), 2
+    )
+    rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
+    rose_data[wave_name] = rose_data[wave_name].astype(str)
 
-# Plot polar wave rose
-fig = px.bar_polar(
-    rose_data,
-    r=freq_name,
-    theta=direction_rosename,
-    color=wave_name,
-    color_discrete_sequence=wave_colours,
-)
+    # Plot polar wave rose
+    figs[idx] = px.bar_polar(
+        rose_data,
+        r=freq_name,
+        theta=direction_rosename,
+        color=wave_name,
+        color_discrete_sequence=wave_colours,
+    )
 
-# # %% Wave rose 2
-# rose2_data = (
-#     df_year.groupby([direction_rosename, wave2_name], observed=False)
-#     .size()
-#     .reset_index(name="counts")
-# )
-# rose2_data[freq_name] = round(
-#     100 * (rose2_data["counts"] / rose2_data["counts"].sum()), 2
-# )
-# rose2_data[direction_rosename] = rose2_data[direction_rosename].astype(float)
-# rose2_data[wave2_name] = rose2_data[wave2_name].astype(str)
-
-# # Plot polar wave rose
-# fig2 = px.bar_polar(
-#     rose2_data,
-#     r=freq_name,
-#     theta=direction_rosename,
-#     color=wave2_name,
-#     color_discrete_sequence=wave2_colours,
-# )
-
-# %% Deploy charts with streamlit
-# tab1, tab2 = st.tabs([wave_name, wave2_name])
-# with tab1:
-#     st.plotly_chart(fig, use_container_width=True)
-# with tab2:
-#     st.plotly_chart(fig2, use_container_width=True)
-
-st.plotly_chart(fig, use_container_width=True)
-
+# Plot wave rose charts with Streamlit + Plotly
+tab1, tab2 = st.tabs([tabs[0], tabs[1]])
+with tab1:
+    st.plotly_chart(figs[0], use_container_width=True)
+with tab2:
+    st.plotly_chart(figs[1], use_container_width=True)
 
 # %% THE END
