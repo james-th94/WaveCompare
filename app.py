@@ -14,6 +14,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
+st.cache_data.clear()
+
 # %% User inputs
 # User inputs - set these in the app.py file
 suffixes = ["obs", "model"]
