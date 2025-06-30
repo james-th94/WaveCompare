@@ -43,7 +43,6 @@ model_na_value = -9999
 # Set common variables
 datetime_col = "Datetime (UTC)"
 timestep = "h"  # Choose minimum step for resampling data: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
-slider_timestep = None
 
 # Set variables to plot
 # Wave direction
@@ -226,13 +225,14 @@ fig_ts.update_layout(
 st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
 
 # %% Create waverose
+st.subheader("Wave roses")
 # Sliderbar selection
 slider_timestep = st.select_slider(
     label="Choose time period for Waverose plotting",
-    options=["Season", "Month", "Year"],
+    options=["None", "Season", "Month", "Year"],
+    value="None",
 )
-if slider_timestep != None:
-    st.subheader("Wave roses")
+if slider_timestep != "None":
     if slider_timestep == "Season":
         selected = st.select_slider(
             label=f"Select Austral season (e.g., Summer is DJF and Winter is JJA)",
