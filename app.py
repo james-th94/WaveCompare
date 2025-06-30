@@ -214,7 +214,11 @@ for idx, column in enumerate([wave_name, wave2_name, direction_name]):
 fig_ts.update_layout(
     height=800,
     margin=dict(t=30, b=50),
-    xaxis=dict(domain=[0.05, 0.95]),
+    # Share same x-axis domain across all subplots
+    xaxis=dict(domain=[0.05, 0.95], anchor="y"),
+    xaxis2=dict(domain=[0.05, 0.95], anchor="y2", showticklabels=False),
+    xaxis3=dict(domain=[0.05, 0.95], anchor="y3", showticklabels=True),
+    # Y-axis subplots
     yaxis=dict(title=wave_name, anchor="x", domain=[0.7, 0.95]),
     yaxis2=dict(title=wave2_name, anchor="x", domain=[0.37, 0.62]),
     yaxis3=dict(title=direction_name, anchor="x", domain=[0.05, 0.3]),
