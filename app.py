@@ -155,6 +155,8 @@ def month2season(datetime_series):
 
 # %% Load data & cache to streamlit app
 season_vals = {"Summer": 1, "Autumn": 2, "Winter": 3, "Spring": 4}
+
+
 # Load data
 @st.cache_data
 def merge_wave_data(df1, df2):
@@ -220,7 +222,7 @@ st.plotly_chart(fig_ts, use_container_width=True)
 
 # %% Process data and create waverose
 # Sidebar - Selection
-if slider_timestep = "Season":
+if slider_timestep == "Season":
     slider_timestep = "Season_val"
 times = sorted(df[slider_timestep].unique())
 st.subheader("Wave roses")
