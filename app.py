@@ -234,7 +234,7 @@ selected = st.slider(
     min_value=int(min(times)),
     max_value=int(max(times)),
     value=int(min(times)),
-    format_func=lambda x: seasonValue2season[x],
+    format_func=lambda x: seasonValue2season.get(x, f"Unknown ({x})"),
 )
 
 # Filter data
