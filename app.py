@@ -18,9 +18,11 @@ st.cache_data.clear()
 
 # %% User inputs
 # User inputs - set these in the app.py file
+page_title = "Wave data comparison"
 suffixes = ["obs", "model"]
 # Input file - observation (obs) data
 obs_wavefile = "data/brissy_data.csv"
+sitename = "Brisbane"
 # Columns of interest - observation data
 obs_datetime_col = "Date/Time (AEST)"
 obs_timezone = "Australia/Brisbane"
@@ -56,6 +58,8 @@ wave_colours = px.colors.sequential.Plasma_r
 # Wave period
 wave2_col = "Tp"
 wave2_name = "Peak wave period (Tp)"
+# For timeseries
+timeseries_title = f"Model (blue) vs observed (black)\nSite: {sitename}"
 # For wave roses:
 freq_name = "Relative frequency (%)"
 waverose_names = ["Observations", "Modelled"]
@@ -179,7 +183,7 @@ df_model = load_model_data(filename=model_wavefile)
 df = merge_wave_data(df_obs, df_model)
 
 # %% Add header to Streamlit webpage
-st.header("Wave Data", divider="grey")
+st.header(page_title, divider="grey")
 
 # %% Timeseries multi-plot - 3 stacked subplots
 fig_ts = go.Figure()
@@ -216,7 +220,7 @@ fig_ts.update_layout(
     yaxis2=dict(title=wave2_name, anchor="x", domain=[0.37, 0.62]),
     yaxis3=dict(title=direction_name, anchor="x", domain=[0.05, 0.3]),
     showlegend=False,
-    title="Wave Timeseries - Model (blue) vs Observations (black)",
+    title=timeseries_title,
 )
 
 st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
