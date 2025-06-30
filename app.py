@@ -190,13 +190,13 @@ def waveStats(predictions, targets):
         MAPE = np.divide(temp, N)
         data = {
             "Bias": np.round(bias, 4),
-            "RMSE (Bryant et al. 2016)": np.round(rmse_demeaned, 4),
-            "RMSE": np.round(rmse, 4),
-            "Scatter Index (Bryant et al. 2016)": np.round(SI, 4),
+            "Root Mean Sqare Error (RMSE)": np.round(rmse, 4),
             "Scatter Index or Normalised RMSE": np.round(SI_2, 4),
             "Coefficient of Determination, R_2": np.round(R_2, 4),
-            "MAE": np.round(MAE, 4),
-            "MAPE": np.round(MAPE, 4),
+            "Mean Average Error": np.round(MAE, 4),
+            "Mean Absolute Percentage Error": np.round(MAPE, 4),
+            "RMSE (Bryant et al. 2016)": np.round(rmse_demeaned, 4),
+            "Scatter Index (Bryant et al. 2016)": np.round(SI, 4),
         }
         return data
 
@@ -276,7 +276,7 @@ st.divider()
 # %% Statistics
 st.subheader("Comparison statistics")
 stats_data = waveStats(
-    predictions=df[f"{wave_name}_model"].values, targets=df[f"{wave_name}_obs"].values
+    predictions=df[f"{wave_name}_model"], targets=df[f"{wave_name}_obs"]
 )
 st.table(stats_data)
 st.divider()
