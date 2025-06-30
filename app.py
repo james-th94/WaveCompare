@@ -233,10 +233,12 @@ st.subheader("Wave roses")
 # Sliderbar selection
 slider_timestep = st.select_slider(
     label="Choose time period for Waverose plotting",
-    options=["None", "Season", "Month", "Year"],
-    value="None",
+    options=["All", "Season", "Month", "Year"],
+    value="All",
 )
-if slider_timestep != "None":
+# Compute wave rose bins
+dir_bins = np.arange(0, 361, direction_resolution)
+if slider_timestep != "All":
     if slider_timestep == "Season":
         selected = st.select_slider(
             label=f"Select Austral season (e.g., Summer is DJF and Winter is JJA)",
@@ -259,9 +261,6 @@ if slider_timestep != "None":
     # Filter data
     df_selected = df[df[slider_timestep] == selected].copy()
 
-    # Compute wave rose bins
-    dir_bins = np.arange(0, 361, direction_resolution)
-
     figs = {}
     tabs = {}
     for idx, data_source in enumerate(suffixes):
@@ -283,6 +282,53 @@ if slider_timestep != "None":
 
         rose_data = (
             df_selected.groupby([direction_rosename, wave_name], observed=False)
+            .size()
+            .reset_index(name="counts")
+        )
+        rose_data[freq_name] = round(
+            100 * (rose_data["counts"] / rose_data["counts"].sum()), 2
+        )
+        rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
+        rose_data[wave_name] = rose_data[wave_name].astype(str)
+
+        # Plot polar wave rose
+        figs[idx] = px.bar_polar(
+            rose_data,
+            r=freq_name,
+            theta=direction_rosename,
+            color=wave_name,
+            color_discrete_sequence=wave_colours,
+        )
+
+    # Plot wave rose charts with Streamlit + Plotly
+    tab1, tab2 = st.tabs([tabs[0], tabs[1]])
+    with tab1:
+        st.plotly_chart(figs[0], use_container_width=True, key=tabs[0])
+    with tab2:
+        st.plotly_chart(figs[1], use_container_width=True, key=tabs[1])
+else:
+
+    figs = {}
+    tabs = {}
+    for idx, data_source in enumerate(suffixes):
+
+        # Name the tab:
+        tabs[idx] = waverose_names[idx]
+        # Select data
+        # Set direction data
+        df.loc[:, direction_rosename] = pd.cut(
+            df[f"{direction_name}_{data_source}"],
+            bins=dir_bins,
+            right=False,
+            labels=dir_bins[:-1],
+        )
+        # Set wave "height" data
+        df.loc[:, wave_name] = pd.cut(
+            df[f"{wave_name}_{data_source}"], bins=wave_bins, right=False
+        )
+
+        rose_data = (
+            df.groupby([direction_rosename, wave_name], observed=False)
             .size()
             .reset_index(name="counts")
         )
