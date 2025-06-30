@@ -157,77 +157,26 @@ for idx, column in enumerate([wave_name, wave2_name, direction_name]):
     axis_id = (
         f"y{idx+1}" if idx > 0 else "y"
     )  # "y" for primary axis, "y2", "y3", etc. for others
-
+    # Observation data
     fig_ts.add_trace(
         go.Scatter(
             x=df.index,
             y=df[f"{column}_obs"],
             name=f"{column} (obs)",
             yaxis=axis_id,
-            line=dict(color="black"),
+            line=dict(color="black", width=1),
         )
     )
-
+    # Model data
     fig_ts.add_trace(
         go.Scatter(
             x=df.index,
             y=df[f"{column}_model"],
             name=f"{column} (model)",
             yaxis=axis_id,
-            line=dict(color="blue"),
+            line=dict(color=px.colors.qualitative.G10[0], width=1),
         )
     )
-
-# # Subplot 1 - Wave "height"
-# fig_ts.add_trace(go.Scatter(
-#     x=df.index,
-#     y=df[f"{wave_name}_obs"],
-#     name=f"{wave_name} (obs)",
-#     yaxis="y1",
-#     line=dict(color="black")
-# ))
-
-# fig_ts.add_trace(go.Scatter(
-#     x=df.index,
-#     y=df[f"{wave_name}_model"],
-#     name=f"{wave_name} (model)",
-#     yaxis="y1",
-#     line=dict(color="blue")
-# ))
-
-# # Subplot 2 - Wave period
-# fig_ts.add_trace(go.Scatter(
-#     x=df.index,
-#     y=df[f"{wave2_name}_obs"],
-#     name=f"{wave2_name} (obs)",
-#     yaxis="y2",
-#     line=dict(color="black")
-# ))
-
-# fig_ts.add_trace(go.Scatter(
-#     x=df.index,
-#     y=df[f"{wave2_name}_model"],
-#     name=f"{wave2_name} (model)",
-#     yaxis="y2",
-#     line=dict(color="blue")
-# ))
-
-# # Subplot 3 - Direction
-# fig_ts.add_trace(go.Scatter(
-#     x=df.index,
-#     y=df[f"{direction_name}_obs"],
-#     name=f"{direction_name} (obs)",
-#     yaxis="y3",
-#     line=dict(color="black")
-# ))
-
-# fig_ts.add_trace(go.Scatter(
-#     x=df.index,
-#     y=df[f"{direction_name}_model"],
-#     name=f"{direction_name} (model)",
-#     yaxis="y3",
-#     line=dict(color="blue")
-# ))
 
 fig_ts.update_layout(
     height=800,
