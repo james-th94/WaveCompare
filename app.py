@@ -276,7 +276,7 @@ st.divider()
 # %% Statistics
 st.subheader("Comparison statistics")
 stats_data = waveStats(
-    predictions=df[f"{wave_name}_model"], targets=df[f"{wave_name}_obs"]
+    predictions=df[f"{wave_name}_model"].values, targets=df[f"{wave_name}_obs"].values
 )
 st.table(stats_data)
 st.divider()
