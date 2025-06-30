@@ -226,8 +226,8 @@ st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
 st.subheader("Wave roses")
 if slider_timestep == "Season":
     selected = st.select_slider(
-        label=f"Select {slider_timestep}",
-        options=["Summer (DJF)", "Autumn (MAM)", "Winter (JJA)", "Spring (SON)"],
+        label=f"Select Austral seasons (e.g., Summer is DJF and Winter is JJA)",
+        options=["Summer", "Autumn", "Winter", "Spring"],
     )
 else:
     times = sorted(df[slider_timestep].unique())
