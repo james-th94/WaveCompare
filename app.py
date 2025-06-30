@@ -58,7 +58,7 @@ wave_colours = px.colors.sequential.Plasma_r
 wave2_col = "Tp"
 wave2_name = "Peak wave period (Tp)"
 # For timeseries
-timeseries_title = f"Model (blue) vs observed (black)\nSite: {sitename}"
+timeseries_title = f"{sitename}: Model (blue) vs observed (black)"
 # For wave roses:
 freq_name = "Relative frequency (%)"
 waverose_names = ["Observations", "Modelled"]
@@ -184,7 +184,7 @@ df = merge_wave_data(df_obs, df_model)
 # %% Add header to Streamlit webpage
 st.header(page_title, divider="grey")
 
-# %% Timeseries multi-plot - 3 stacked subplots
+# %% Timeseries multi-plot - stacked subplots
 fig_ts = go.Figure()
 for idx, column in enumerate([wave_name, wave2_name, direction_name]):
     axis_id = (
@@ -214,7 +214,7 @@ for idx, column in enumerate([wave_name, wave2_name, direction_name]):
 fig_ts.update_layout(
     height=800,
     margin=dict(t=30, b=50),
-    xaxis3=dict(domain=[0.05, 0.95]),
+    xaxis=dict(domain=[0.05, 0.95]),
     yaxis=dict(title=wave_name, anchor="x", domain=[0.7, 0.95]),
     yaxis2=dict(title=wave2_name, anchor="x", domain=[0.37, 0.62]),
     yaxis3=dict(title=direction_name, anchor="x", domain=[0.05, 0.3]),
