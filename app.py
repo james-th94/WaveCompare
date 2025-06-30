@@ -192,7 +192,7 @@ def waveStats(predictions, targets):
             "Bias": np.round(bias, 4),
             "Root Mean Sqare Error (RMSE)": np.round(rmse, 4),
             "Scatter Index or Normalised RMSE": np.round(SI_2, 4),
-            "Coefficient of Determination, R_2": np.round(R_2, 4),
+            "Coefficient of Determination, $R^{2}$": np.round(R_2, 4),
             "Mean Average Error": np.round(MAE, 4),
             "Mean Absolute Percentage Error": np.round(MAPE, 4),
             "RMSE (Bryant et al. 2016)": np.round(rmse_demeaned, 4),
