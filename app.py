@@ -227,8 +227,9 @@ st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
 
 # %% Create waverose
 # Sliderbar selection
-slider_timestep = st.select_slider(label = "Choose time period"
-                                   options = ["Season", "Month"])
+slider_timestep = st.select_slider(
+    label="Choose time period", options=["Season", "Month"]
+)
 st.subheader("Wave roses")
 if slider_timestep == "Season":
     selected = st.select_slider(
