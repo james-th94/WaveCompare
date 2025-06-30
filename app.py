@@ -50,7 +50,7 @@ direction_name = "Peak wave direction (\u00b0)"
 direction_rosename = "Directional bin (\u00b0)"
 # Wave "height"
 wave_col = "hs"
-wave_bins = np.arange(0, 6, 0.5)
+wave_bins = np.arange(0, 5.5, 0.5)
 wave_name = "Significant wave height (m)"
 wave_colours = px.colors.sequential.Plasma_r
 # Wave period
@@ -60,10 +60,8 @@ wave2_name = "Peak wave period (Tp)"
 freq_name = "Relative frequency (%)"
 waverose_names = ["Observations", "Modelled"]
 
-# %% Create functions
+
 # Create functions
-
-
 def parse_obs_dates(datetime_series):
     # Try fast parsing with format 1
     parsed = (
@@ -221,7 +219,7 @@ fig_ts.update_layout(
     title="Wave Timeseries - Model (blue) vs Observations (black)",
 )
 
-st.plotly_chart(fig_ts, use_container_width=True)
+st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
 
 # %% Create waverose
 # Sliderbar selection
@@ -288,8 +286,8 @@ for idx, data_source in enumerate(suffixes):
 # Plot wave rose charts with Streamlit + Plotly
 tab1, tab2 = st.tabs([tabs[0], tabs[1]])
 with tab1:
-    st.plotly_chart(figs[0], use_container_width=True)
+    st.plotly_chart(figs[0], use_container_width=True, key=tabs[0])
 with tab2:
-    st.plotly_chart(figs[1], use_container_width=True)
+    st.plotly_chart(figs[1], use_container_width=True, key=tabs[1])
 
 # %% THE END
