@@ -208,11 +208,14 @@ df_selected = df[df[slider_timestep] == selected].copy()
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
 df_selected.loc[:, direction_rosename] = pd.cut(
-    df_selected[direction_name], bins=dir_bins, right=False, labels=dir_bins[:-1]
+    df_selected[f"{direction_name}_obs"],
+    bins=dir_bins,
+    right=False,
+    labels=dir_bins[:-1],
 )
 
 df_selected.loc[:, wave_name] = pd.cut(
-    df_selected[wave_name], bins=wave_bins, right=False
+    df_selected[f"{wave_name}_obs"], bins=wave_bins, right=False
 )
 # df_selected.loc[:, wave_name] = pd.cut(df_selected[wave_name], bins=wave_bins, right=False)
 
