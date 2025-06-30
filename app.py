@@ -235,6 +235,8 @@ if slider_timestep == "Season":
         max_value=int(max(times)),
         value=int(min(times)),
     )
+    # Filter data
+    df_selected = df[df[slider_timestep] == selected].copy()
 else:
     times = sorted(df[slider_timestep].unique())
     st.subheader("Wave roses")
@@ -244,9 +246,9 @@ else:
         max_value=int(max(times)),
         value=int(min(times)),
     )
+    # Filter data
+    df_selected = df[df[slider_timestep] == selected].copy()
 
-# Filter data
-df_selected = df[df[slider_timestep] == selected].copy()
 
 # Compute wave rose bins
 dir_bins = np.arange(0, 361, direction_resolution)
