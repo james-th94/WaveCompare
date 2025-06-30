@@ -16,6 +16,7 @@ import numpy as np
 
 # %% User inputs
 # User inputs - set these in the app.py file
+suffixes = ["obs", "model"]
 # Input file - observation (obs) data
 obs_wavefile = "data/brissy_data.csv"
 # Columns of interest - observation data
@@ -38,7 +39,7 @@ model_na_value = -9999
 # Set common variables
 datetime_col = "Datetime (UTC)"
 timestep = "h"  # Choose minimum step for resampling data: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
-slider_timestep = "Month"
+slider_timestep = "Season"
 
 # Set variables to plot
 # Wave direction
@@ -55,6 +56,7 @@ wave2_col = "Tp"
 wave2_name = "Peak wave period (Tp)"
 # For wave roses:
 freq_name = "Relative frequency (%)"
+waverose_names = ["Observations", "Model"]
 
 # %% Create functions
 # Create functions
@@ -131,15 +133,38 @@ def load_model_data(filename, datetime_column=model_datetime_col):
     return df
 
 
+def month2season(datetime_series):
+    months = datetime_series.month
+    seasons = {
+        12: "Summer",
+        1: "Summer",
+        2: "Summer",
+        3: "Autumn",
+        4: "Autumn",
+        5: "Autumn",
+        6: "Winter",
+        7: "Winter",
+        8: "Winter",
+        9: "Spring",
+        10: "Spring",
+        11: "Spring",
+    }
+    season = months.map(seasons)
+    return season
+
+
 # %% Load data & cache to streamlit app
 # Load data
 @st.cache_data
 def merge_wave_data(df1, df2):
     # Merge dataframes
-    df = df1.join(df2, how="inner", lsuffix="_obs", rsuffix="_model")
+    df = df1.join(
+        df2, how="inner", lsuffix=f"_{suffixes[0]}", rsuffix=f"_{suffixes[1]}"
+    )
     # Add options for slider timestep
     df["Year"] = df.index.year
     df["Month"] = df.index.month
+    df["Season"] = month2season(df.index)
     return df
 
 
@@ -210,7 +235,8 @@ dir_bins = np.arange(0, 361, direction_resolution)
 
 figs = {}
 tabs = {}
-for idx, data_source in enumerate(["obs", "model"]):
+for idx, data_source in enumerate(suffixes):
+
     # Name the tab:
     tabs[idx] = data_source
     # Select data
