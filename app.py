@@ -240,12 +240,15 @@ if slider_timestep != "None":
         )
     else:
         times = sorted(df[slider_timestep].unique())
-        selected = st.slider(
-            label=f"Select {slider_timestep}",
-            min_value=int(min(times)),
-            max_value=int(max(times)),
-            value=int(min(times)),
-        )
+        if max(times) == min(times):
+            selected = times[0]
+        else:
+            selected = st.slider(
+                label=f"Select {slider_timestep}",
+                min_value=int(min(times)),
+                max_value=int(max(times)),
+                value=int(min(times)),
+            )
     # Filter data
     df_selected = df[df[slider_timestep] == selected].copy()
 
