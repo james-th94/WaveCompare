@@ -58,7 +58,7 @@ wave2_col = "Tp"
 wave2_name = "Peak wave period (Tp)"
 # For wave roses:
 freq_name = "Relative frequency (%)"
-waverose_names = ["Observations", "Model"]
+waverose_names = ["Observations", "Modelled"]
 
 # %% Create functions
 # Create functions
