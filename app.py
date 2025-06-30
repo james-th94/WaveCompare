@@ -186,52 +186,54 @@ fig_ts.update_layout(
     yaxis2=dict(title=wave2_name, anchor="x", domain=[0.37, 0.62]),
     yaxis3=dict(title=direction_name, anchor="x", domain=[0.05, 0.3]),
     showlegend=False,
-    title="Wave Timeseries (all data)",
+    title="Wave Timeseries - Model (blue) vs Observations (black)",
 )
 
 st.plotly_chart(fig_ts, use_container_width=True)
 
-# # %% Process data and create waverose
-# # Sidebar - Year selection
-# years = sorted(df["year"].unique())
-# st.subheader("Yearly wave roses")
-# selected_year = st.slider(
-#     "Select year",
-#     min_value=int(min(years)),
-#     max_value=int(max(years)),
-#     value=int(min(years)),
-# )
+# %% Process data and create waverose
+# Sidebar - Selection
+times = sorted(df[slider_timestep].unique())
+st.subheader("Wave roses")
+selected = st.slider(
+    f"Select {slider_timestep}",
+    min_value=int(min(times)),
+    max_value=int(max(times)),
+    value=int(min(times)),
+)
 
-# # Filter data
-# df_year = df[df["year"] == selected_year].copy()
+# Filter data
+df_selected = df[df[slider_timestep] == selected].copy()
 
-# # Compute wave rose bins
-# dir_bins = np.arange(0, 361, direction_resolution)
-# df_year.loc[:, direction_rosename] = pd.cut(
-#     df_year[direction_col], bins=dir_bins, right=False, labels=dir_bins[:-1]
-# )
+# Compute wave rose bins
+dir_bins = np.arange(0, 361, direction_resolution)
+df_selected.loc[:, direction_rosename] = pd.cut(
+    df_selected[direction_name], bins=dir_bins, right=False, labels=dir_bins[:-1]
+)
 
-# df_year.loc[:, wave_name] = pd.cut(df_year[wave_col], bins=wave_bins, right=False)
-# df_year.loc[:, wave2_name] = pd.cut(df_year[wave2_col], bins=wave2_bins, right=False)
+df_selected.loc[:, wave_name] = pd.cut(
+    df_selected[wave_name], bins=wave_bins, right=False
+)
+# df_selected.loc[:, wave_name] = pd.cut(df_selected[wave_name], bins=wave_bins, right=False)
 
-# # %% Wave rose 1
-# rose_data = (
-#     df_year.groupby([direction_rosename, wave_name], observed=False)
-#     .size()
-#     .reset_index(name="counts")
-# )
-# rose_data[freq_name] = round(100 * (rose_data["counts"] / rose_data["counts"].sum()), 2)
-# rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
-# rose_data[wave_name] = rose_data[wave_name].astype(str)
+# %% Wave rose 1
+rose_data = (
+    df_selected.groupby([direction_rosename, wave_name], observed=False)
+    .size()
+    .reset_index(name="counts")
+)
+rose_data[freq_name] = round(100 * (rose_data["counts"] / rose_data["counts"].sum()), 2)
+rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
+rose_data[wave_name] = rose_data[wave_name].astype(str)
 
-# # Plot polar wave rose
-# fig = px.bar_polar(
-#     rose_data,
-#     r=freq_name,
-#     theta=direction_rosename,
-#     color=wave_name,
-#     color_discrete_sequence=wave_colours,
-# )
+# Plot polar wave rose
+fig = px.bar_polar(
+    rose_data,
+    r=freq_name,
+    theta=direction_rosename,
+    color=wave_name,
+    color_discrete_sequence=wave_colours,
+)
 
 # # %% Wave rose 2
 # rose2_data = (
@@ -254,14 +256,14 @@ st.plotly_chart(fig_ts, use_container_width=True)
 #     color_discrete_sequence=wave2_colours,
 # )
 
-# # %% Deploy charts with streamlit
+# %% Deploy charts with streamlit
 # tab1, tab2 = st.tabs([wave_name, wave2_name])
 # with tab1:
 #     st.plotly_chart(fig, use_container_width=True)
 # with tab2:
 #     st.plotly_chart(fig2, use_container_width=True)
 
+st.plotly_chart(fig, use_container_width=True)
 
-# # %% THE END
 
-# %%
+# %% THE END
