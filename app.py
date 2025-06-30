@@ -133,7 +133,7 @@ def load_model_data(filename, datetime_column=model_datetime_col):
 
 # %% Load data & cache to streamlit app
 # Load data
-# @st.cache_data
+@st.cache_data
 def merge_wave_data(df1, df2):
     # Merge dataframes
     df = df1.join(df2, how="inner", lsuffix="_obs", rsuffix="_model")
