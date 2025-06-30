@@ -160,6 +160,47 @@ season2seasonValue = {"Summer": 1, "Autumn": 2, "Winter": 3, "Spring": 4}
 seasonValue2season = {v: k for k, v in season2seasonValue.items()}
 
 
+# Wave statistics based on Wave Information Studies Model Evaluation Statistics (Bryant et al. 2016)
+def waveStats(predictions, targets):
+    if len(predictions) != len(targets):
+        return print("Failed: Length of predictions and targets variables differ.")
+    else:
+        residuals = predictions - targets
+        SSresiduals = np.sum(np.square(residuals))
+        SStotal = np.sum(np.square(np.mean(targets) - targets))
+        R_2 = 1 - np.divide(
+            SSresiduals, SStotal
+        )  # Coefficient of determination (-inf to 1)
+        N = len(targets)  # number of samples
+        bias = np.divide(np.sum(residuals), N)  # bias in predictions
+        temp = np.sum(np.square(residuals - bias))
+        rmse_demeaned = np.sqrt(
+            np.divide(temp, N - 1)
+        )  # a measure of the residuals between the predictions and observations with bias removed
+        rmse = np.sqrt(((residuals) ** 2).mean())
+        SI = np.divide(
+            rmse_demeaned, np.mean(targets)
+        )  # scatter index like Bryant et al. (2016)
+        SI_2 = np.divide(rmse, np.mean(targets))  # scatter index like Ris et al. (1999)
+        temp = np.sum([np.abs(predictions[i] - targets[i]) for i in range(N)])
+        MAE = np.divide(temp, N)
+        temp = np.sum(
+            [np.abs((predictions[i] - targets[i]) / targets[i]) for i in range(N)]
+        )
+        MAPE = np.divide(temp, N)
+        data = {
+            "Bias": np.round(bias, 4),
+            "RMSE (Bryant et al. 2016)": np.round(rmse_demeaned, 4),
+            "RMSE": np.round(rmse, 4),
+            "Scatter Index (Bryant et al. 2016)": np.round(SI, 4),
+            "Scatter Index or Normalised RMSE": np.round(SI_2, 4),
+            "Coefficient of Determination, R_2": np.round(R_2, 4),
+            "MAE": np.round(MAE, 4),
+            "MAPE": np.round(MAPE, 4),
+        }
+        return data
+
+
 # %% Load data & cache to streamlit app
 # Load data
 @st.cache_data
@@ -221,15 +262,24 @@ fig_ts.update_layout(
     xaxis=dict(domain=[0.05, 0.95], anchor="y", showticklabels=False),
     xaxis2=dict(domain=[0.05, 0.95], anchor="y2", showticklabels=False),
     xaxis3=dict(domain=[0.05, 0.95], anchor="y3", showticklabels=True),
-    # Y-axis subplots
+    # Y-axis deatils for each subplot
     yaxis=dict(title=wave_name, anchor="x", domain=[0.7, 0.95]),
     yaxis2=dict(title=wave2_name, anchor="x2", domain=[0.37, 0.62]),
     yaxis3=dict(title=direction_name, anchor="x3", domain=[0.05, 0.3]),
-    showlegend=True,
+    showlegend=False,
     title=timeseries_title,
 )
 
 st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
+st.divider()
+
+# %% Statistics
+st.subheader("Comparison statistics")
+stats_data = waveStats(
+    predictions=df[f"{wave_name}_model"], targets=df[f"{wave_name}_obs"]
+)
+st.table(stats_data)
+st.divider()
 
 # %% Create waverose
 st.subheader("Wave roses")
