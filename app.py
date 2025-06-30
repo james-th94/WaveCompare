@@ -43,7 +43,7 @@ model_na_value = -9999
 # Set common variables
 datetime_col = "Datetime (UTC)"
 timestep = "h"  # Choose minimum step for resampling data: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
-slider_timestep = "Season"
+slider_timestep = None
 
 # Set variables to plot
 # Wave direction
@@ -228,73 +228,74 @@ st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
 # %% Create waverose
 # Sliderbar selection
 slider_timestep = st.select_slider(
-    label="Choose time period", options=["Season", "Month"]
+    label="Choose time period for Waverose plotting",
+    options=["Season", "Month", "Year"],
 )
-st.subheader("Wave roses")
-if slider_timestep == "Season":
-    selected = st.select_slider(
-        label=f"Select Austral season (e.g., Summer is DJF and Winter is JJA)",
-        options=["Summer", "Autumn", "Winter", "Spring"],
-    )
-else:
-    times = sorted(df[slider_timestep].unique())
-    selected = st.slider(
-        label=f"Select {slider_timestep}",
-        min_value=int(min(times)),
-        max_value=int(max(times)),
-        value=int(min(times)),
-    )
-# Filter data
-df_selected = df[df[slider_timestep] == selected].copy()
+if slider_timestep != None:
+    st.subheader("Wave roses")
+    if slider_timestep == "Season":
+        selected = st.select_slider(
+            label=f"Select Austral season (e.g., Summer is DJF and Winter is JJA)",
+            options=["Summer", "Autumn", "Winter", "Spring"],
+        )
+    else:
+        times = sorted(df[slider_timestep].unique())
+        selected = st.slider(
+            label=f"Select {slider_timestep}",
+            min_value=int(min(times)),
+            max_value=int(max(times)),
+            value=int(min(times)),
+        )
+    # Filter data
+    df_selected = df[df[slider_timestep] == selected].copy()
 
+    # Compute wave rose bins
+    dir_bins = np.arange(0, 361, direction_resolution)
 
-# Compute wave rose bins
-dir_bins = np.arange(0, 361, direction_resolution)
+    figs = {}
+    tabs = {}
+    for idx, data_source in enumerate(suffixes):
 
-figs = {}
-tabs = {}
-for idx, data_source in enumerate(suffixes):
+        # Name the tab:
+        tabs[idx] = waverose_names[idx]
+        # Select data
+        # Set direction data
+        df_selected.loc[:, direction_rosename] = pd.cut(
+            df_selected[f"{direction_name}_{data_source}"],
+            bins=dir_bins,
+            right=False,
+            labels=dir_bins[:-1],
+        )
+        # Set wave "height" data
+        df_selected.loc[:, wave_name] = pd.cut(
+            df_selected[f"{wave_name}_{data_source}"], bins=wave_bins, right=False
+        )
 
-    # Name the tab:
-    tabs[idx] = waverose_names[idx]
-    # Select data
-    # Set direction data
-    df_selected.loc[:, direction_rosename] = pd.cut(
-        df_selected[f"{direction_name}_{data_source}"],
-        bins=dir_bins,
-        right=False,
-        labels=dir_bins[:-1],
-    )
-    # Set wave "height" data
-    df_selected.loc[:, wave_name] = pd.cut(
-        df_selected[f"{wave_name}_{data_source}"], bins=wave_bins, right=False
-    )
+        rose_data = (
+            df_selected.groupby([direction_rosename, wave_name], observed=False)
+            .size()
+            .reset_index(name="counts")
+        )
+        rose_data[freq_name] = round(
+            100 * (rose_data["counts"] / rose_data["counts"].sum()), 2
+        )
+        rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
+        rose_data[wave_name] = rose_data[wave_name].astype(str)
 
-    rose_data = (
-        df_selected.groupby([direction_rosename, wave_name], observed=False)
-        .size()
-        .reset_index(name="counts")
-    )
-    rose_data[freq_name] = round(
-        100 * (rose_data["counts"] / rose_data["counts"].sum()), 2
-    )
-    rose_data[direction_rosename] = rose_data[direction_rosename].astype(float)
-    rose_data[wave_name] = rose_data[wave_name].astype(str)
+        # Plot polar wave rose
+        figs[idx] = px.bar_polar(
+            rose_data,
+            r=freq_name,
+            theta=direction_rosename,
+            color=wave_name,
+            color_discrete_sequence=wave_colours,
+        )
 
-    # Plot polar wave rose
-    figs[idx] = px.bar_polar(
-        rose_data,
-        r=freq_name,
-        theta=direction_rosename,
-        color=wave_name,
-        color_discrete_sequence=wave_colours,
-    )
-
-# Plot wave rose charts with Streamlit + Plotly
-tab1, tab2 = st.tabs([tabs[0], tabs[1]])
-with tab1:
-    st.plotly_chart(figs[0], use_container_width=True, key=tabs[0])
-with tab2:
-    st.plotly_chart(figs[1], use_container_width=True, key=tabs[1])
+    # Plot wave rose charts with Streamlit + Plotly
+    tab1, tab2 = st.tabs([tabs[0], tabs[1]])
+    with tab1:
+        st.plotly_chart(figs[0], use_container_width=True, key=tabs[0])
+    with tab2:
+        st.plotly_chart(figs[1], use_container_width=True, key=tabs[1])
 
 # %% THE END
