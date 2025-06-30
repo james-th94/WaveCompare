@@ -168,7 +168,7 @@ def merge_wave_data(df1, df2):
     df["Year"] = df.index.year
     df["Month"] = df.index.month
     df["Season"] = month2season(df.index)
-    df["Season_val"] = df["Seasons"].map(season_vals)
+    df["Season_val"] = df["Season"].map(season_vals)
     return df
 
 
