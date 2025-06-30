@@ -18,3 +18,8 @@
 /.virtual_documents
 /manuscripts
 /classification
+# Useful for hiding other scripts (e.g., downloading WHACS data)
+/src
+# Useful for hiding data
+/data/raw
+/data/ss
