@@ -156,7 +156,8 @@ def month2season(datetime_series):
 
 
 # %% Load data & cache to streamlit app
-season_vals = {"Summer": 1, "Autumn": 2, "Winter": 3, "Spring": 4}
+season2seasonValue = {"Summer": 1, "Autumn": 2, "Winter": 3, "Spring": 4}
+seasonValue2season = {v: k for k, v in season2seasonValue.items()}
 
 
 # Load data
@@ -170,7 +171,7 @@ def merge_wave_data(df1, df2):
     df["Year"] = df.index.year
     df["Month"] = df.index.month
     df["Season"] = month2season(df.index)
-    df["Season_val"] = df["Season"].map(season_vals)
+    df["Season_val"] = df["Season"].map(season2seasonValue)
     return df
 
 
@@ -233,6 +234,7 @@ selected = st.slider(
     min_value=int(min(times)),
     max_value=int(max(times)),
     value=int(min(times)),
+    format_func=lambda x: seasonValue2season[x],
 )
 
 # Filter data
