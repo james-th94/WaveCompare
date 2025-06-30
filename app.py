@@ -223,20 +223,23 @@ fig_ts.update_layout(
 
 st.plotly_chart(fig_ts, use_container_width=True)
 
-# %% Process data and create waverose
+# %% Create waverose
 # Sliderbar selection
-slider_name = slider_timestep
-if slider_timestep == "Season":
-    slider_timestep = "Season_val"
-    slider_name = "Season"
-times = sorted(df[slider_timestep].unique())
 st.subheader("Wave roses")
-selected = st.slider(
-    label=f"Select {slider_name}",
-    min_value=int(min(times)),
-    max_value=int(max(times)),
-    value=int(min(times)),
-)
+if slider_timestep == "Season":
+    times = sorted(df["Season_val"].unique())
+    selected = st.select_slider(
+        label=f"Select {slider_timestep}",
+        options=["Summer", "Autumn", "Winter", "Spring"],
+    )
+else:
+    times = sorted(df[slider_timestep].unique())
+    selected = st.slider(
+        label=f"Select {slider_timestep}",
+        min_value=int(min(times)),
+        max_value=int(max(times)),
+        value=int(min(times)),
+    )
 # Filter data
 df_selected = df[df[slider_timestep] == selected].copy()
 
