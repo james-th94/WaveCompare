@@ -215,7 +215,7 @@ fig_ts.update_layout(
     height=800,
     margin=dict(t=30, b=50),
     # Share same x-axis domain across all subplots
-    xaxis=dict(domain=[0.05, 0.95], anchor="y"),
+    xaxis=dict(domain=[0.05, 0.95], anchor="y", showticklabels=False),
     xaxis2=dict(domain=[0.05, 0.95], anchor="y2", showticklabels=False),
     xaxis3=dict(domain=[0.05, 0.95], anchor="y3", showticklabels=True),
     # Y-axis subplots
