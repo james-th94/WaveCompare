@@ -187,16 +187,18 @@ st.header(page_title, divider="grey")
 # %% Timeseries multi-plot - stacked subplots
 fig_ts = go.Figure()
 for idx, column in enumerate([wave_name, wave2_name, direction_name]):
-    axis_id = (
+    yaxis_id = (
         f"y{idx+1}" if idx > 0 else "y"
     )  # "y" for primary axis, "y2", "y3", etc. for others
+    xaxis_id = f"x{idx+1}" if idx > 0 else "x"
     # Observation data
     fig_ts.add_trace(
         go.Scatter(
             x=df.index,
             y=df[f"{column}_obs"],
             name=f"{column} (obs)",
-            yaxis=axis_id,
+            xaxis=xaxis_id,
+            yaxis=yaxis_id,
             line=dict(color="black", width=1),
         )
     )
@@ -206,7 +208,8 @@ for idx, column in enumerate([wave_name, wave2_name, direction_name]):
             x=df.index,
             y=df[f"{column}_model"],
             name=f"{column} (model)",
-            yaxis=axis_id,
+            xaxis=xaxis_id,
+            yaxis=yaxis_id,
             line=dict(color=px.colors.qualitative.G10[0], width=1),
         )
     )
@@ -220,9 +223,9 @@ fig_ts.update_layout(
     xaxis3=dict(domain=[0.05, 0.95], anchor="y3", showticklabels=True),
     # Y-axis subplots
     yaxis=dict(title=wave_name, anchor="x", domain=[0.7, 0.95]),
-    yaxis2=dict(title=wave2_name, anchor="x", domain=[0.37, 0.62]),
-    yaxis3=dict(title=direction_name, anchor="x", domain=[0.05, 0.3]),
-    showlegend=False,
+    yaxis2=dict(title=wave2_name, anchor="x2", domain=[0.37, 0.62]),
+    yaxis3=dict(title=direction_name, anchor="x3", domain=[0.05, 0.3]),
+    showlegend=True,
     title=timeseries_title,
 )
 
