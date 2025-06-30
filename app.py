@@ -242,6 +242,9 @@ if slider_timestep != "None":
         times = sorted(df[slider_timestep].unique())
         if max(times) == min(times):
             selected = times[0]
+            st.text(
+                f"{slider_timestep} is set to {selected} (no other options available)."
+            )
         else:
             selected = st.slider(
                 label=f"Select {slider_timestep}",
