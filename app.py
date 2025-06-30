@@ -227,10 +227,12 @@ st.plotly_chart(fig_ts, use_container_width=True, key="Timeseries")
 
 # %% Create waverose
 # Sliderbar selection
+slider_timestep = st.select_slider(label = "Choose time period"
+                                   options = ["Season", "Month"])
 st.subheader("Wave roses")
 if slider_timestep == "Season":
     selected = st.select_slider(
-        label=f"Select Austral seasons (e.g., Summer is DJF and Winter is JJA)",
+        label=f"Select Austral season (e.g., Summer is DJF and Winter is JJA)",
         options=["Summer", "Autumn", "Winter", "Spring"],
     )
 else:
